@@ -8,7 +8,7 @@ const setText = {
     setHello:["Хеллоу","Hi","драсте"],
     setLike:["I like","аз обичам","аз харесвам"],
     setTime:["Колко е часа?","Час","Време","hour"],
-    setWeather:["Weather","прогноза","вали","градус","ракия","сняг","дъжд"]
+    setWeather:["weather","прогноза","вали","градус","ракия","сняг","дъжд"]
 };
 //responding text
 const randomText = {
@@ -70,6 +70,57 @@ function timeFunction(){
     lastNumber=randomNumber;   
 }
 
+function weatherFunction(){
+    let temp;
+    let windSpeed;
+    let weatherCondition;
+    let windDirection;
+    fetch('https://api.openweathermap.org/data/2.5/weather?q=Varna&lang=bg&APPID=5637a28789778bf15860cef0c6d5e947')
+.then(response=>response.json())
+.then(data => {
+    temp=data['main']['temp'];  
+    windSpeed=data['wind']['speed'];
+    windDirection=data['wind']['deg'];
+    weatherCondition=data['weather'][0]['description']
+    console.log(data);
+})
+.catch(error=>alert("Somethings wrong I can feel it"));
+
+setTimeout(logTemp,200); 
+
+function logTemp(){
+
+    if(windDirection<=45&&windDirection>=0)windDirection="север";
+    else if(windDirection>45&&windDirection<=90)windDirection="северо-изток";
+    else if(windDirection>90&&windDirection<=135)windDirection="изток";
+    else if(windDirection>135&&windDirection<=180)windDirection="юго-изток";
+    else if(windDirection>180&&windDirection<=225)windDirection="юг";
+    else if(windDirection>225&&windDirection<=270)windDirection="юго-запад";
+    else if(windDirection>270&&windDirection<=315)windDirection="запад";
+    else if(windDirection>315&&windDirection<=360)windDirection="северо-запад";
+
+
+    let weather=[ 
+        `В момента е ${weatherCondition}`,
+        `За тези, които ги мързи да погледнат през прозореца - вън е ${weatherCondition}`,
+        `*Наплюнчва пръст и го показва през прозореца* Усещам вятър в посока ${windDirection}, около ${windSpeed} метра в секунда`,
+        `Навън е ${Math.floor(temp/10)} градуса`
+    ];
+
+    if(Math.floor(temp/10)<=0){
+        weather[weather.length-1]=`Вън е ${Math.round(temp/10)} градуса, егати студа!`;
+    }
+    if(Math.floor(temp/10)>=30){
+        weather[weather.length-1]=`${Math.round(temp/10)} градуса, как живеете вие в тая жега, добре че съм бот!`;
+    }
+        randomNumber=Math.floor(Math.random()*(weather.length));
+        while(randomNumber===weather.length||randomNumber===lastNumber)randomNumber=Math.floor(Math.random()*(weather.length));
+
+        response.textContent=weather[randomNumber];
+    lastNumber=randomNumber;  
+}
+}
+
 function functionTree() {
     if(setText.setHello.includes(input.value)){
         randomNumber=Math.round((Math.random()*randomText.greeting.length));
@@ -92,9 +143,9 @@ function functionTree() {
     else if(setText.setTime.includes(input.value)){
     timeFunction();
     }
-    /*else if(setText.setWeather.includes(input.value)){
+    else if(setText.setWeather.includes(input.value)){
         weatherFunction();
-    }*/
+    }
     else{
         return;
     }

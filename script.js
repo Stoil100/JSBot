@@ -1,8 +1,10 @@
 let randomNumber;
 let lastNumber;
 let input = document.getElementById('input1');
+    const itemsList = document.querySelector('.place');
 const response = document.getElementById('responseArea');
 const button = document.querySelector('.highlight');
+    let items = JSON.parse(localStorage.getItem('items'))||[];
 //set text
 const setText = {
     setHello:["Хеллоу","Hi","драсте"],
@@ -15,6 +17,7 @@ const randomText = {
     greeting:["Hey, I'm bot", "Здрастииии","Добро утроо","Heya!"],
     hello:["Hey, I'm bot", "Здрастииии","Добро утроо","Heya!","from the other side","is it me you are looking for?"],
     like:["Кондьо", "Джена" ,"Джорджано", "Гери и Никол"],
+    random:["Did I mention that you speak Bulgarian?","Oh my!"," ", "Yeah dude, I feel that..","That's a weird thing to say,"," "]
     /*time:[`абе май е ${setInterval(trolTimeFunction,1000)}`,`Шес бес десет, няма бе, ${setInterval(actualTimeFunction,1000)} е..`],/*,`Ако умножиш ${X} по ${Y} ще получиш unix timestamp, който лесно можеш сам да си пресметнеш и да получиш текущата дата`],
     weather:[ 
         `В момента е ${weatherDescription}`,
@@ -90,7 +93,7 @@ setTimeout(logTemp,200);
 
 function logTemp(){
 
-    if(windDirection<=45&&windDirection>=0)windDirection="север";
+    if(windDirection>=0&&windDirection<=45)windDirection="север";
     else if(windDirection>45&&windDirection<=90)windDirection="северо-изток";
     else if(windDirection>90&&windDirection<=135)windDirection="изток";
     else if(windDirection>135&&windDirection<=180)windDirection="юго-изток";
@@ -121,6 +124,31 @@ function logTemp(){
 }
 }
 
+function addItem(e){
+    const text=input.text;
+    const item={text}
+    items.push(item);
+    populateList(items,itemsList);
+    localStorage.setItem('items',JSON.stringify(items));
+    this.reset();
+  }
+  function populateList(plates = [], platesList) {
+    platesList = plates.map((plate,i) => {
+      return `
+        <p>
+          <input type="checkbox" data-index=${i} id="item${i}"} />
+          <label for="item${i}">${plate.text}</label>
+        </p>
+      `;
+    }).join('');
+  }
+
+function todo(){
+addItem();
+populateList(items,itemsList);
+}
+
+
 function functionTree() {
     if(setText.setHello.includes(input.value)){
         randomNumber=Math.round((Math.random()*randomText.greeting.length));
@@ -146,9 +174,20 @@ function functionTree() {
     else if(setText.setWeather.includes(input.value)){
         weatherFunction();
     }
+    else if(input.value==="sup"){
+        todo();
+    }
     else{
-        return;
+        randomNumber=Math.floor(Math.random()*(randomText.random.length));
+        while(randomNumber===randomText.random.length||randomNumber===lastNumber){
+            randomNumber=Math.floor(Math.random()*(randomText.random.length));
+        }
+
+        response.textContent=randomText.random[randomNumber];
+        lastNumber=randomNumber;
     }
 }
 
-button.addEventListener('click', functionTree);
+
+input.addEventListener('keyup', functionTree);
+populateList(items,itemsList);

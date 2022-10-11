@@ -1,10 +1,10 @@
 let randomNumber;
 let lastNumber;
 let input = document.getElementById('input1');
-    const itemsList = document.querySelector('.place');
 const response = document.getElementById('responseArea');
-const button = document.querySelector('.highlight');
-    let items = JSON.parse(localStorage.getItem('items'))||[];
+const button = document.querySelector('.button');
+const itemsList=document.querySelector('.place');
+const items = JSON.parse(localStorage.getItem('items'))||[];
 //set text
 const setText = {
     setHello:["Хеллоу","Hi","драсте"],
@@ -26,6 +26,20 @@ const randomText = {
         `Вън е ${temp} градуса, егати студа!`, (Note: When temperature is below 0 celsius)
         `${temp} градуса, как живеете вие в тая жега, добре че съм бот!`]*/
 };
+
+const setCommand = 'боте, запомни в ';
+const logCommand = 'боте, кво запомни?';
+const deleteCommand = 'боте, махни ';
+let rgxSet = new RegExp("^(".concat(setCommand, ") *\w*"));
+let rgxLog = new RegExp(`${logCommand}`);
+let rgxDelete = new RegExp("^(".concat(deleteCommand, ") *\w*"));
+let TodoListLog=[];
+
+console.log("боте, запомни в баба си - си да",
+"боте, кво запомни?","боте, махни баба си value");
+ 
+let TodoList={};
+let lowChanceResponseText=["да ъпгрейдна бота", "да си гледам работата!", "да спра да занимавам бота с глупости", "да си пусна новата песен на Криско"];
 
 function timeFunction(){
     let currentTime=new Date();
@@ -123,29 +137,102 @@ function logTemp(){
     lastNumber=randomNumber;  
 }
 }
-
-function addItem(e){
-    const text=input.text;
-    const item={text}
-    items.push(item);
-    populateList(items,itemsList);
-    localStorage.setItem('items',JSON.stringify(items));
-    this.reset();
-  }
-  function populateList(plates = [], platesList) {
-    platesList = plates.map((plate,i) => {
-      return `
-        <p>
-          <input type="checkbox" data-index=${i} id="item${i}"} />
-          <label for="item${i}">${plate.text}</label>
-        </p>
-      `;
-    }).join('');
-  }
-
-function todo(){
-addItem();
-populateList(items,itemsList);
+  function TODOfunctionHub(){
+    if(rgxSet.test(input.value)){
+        doFunction();
+    }
+    else if(rgxLog.test(input.value)){
+        TodoListLog=[];
+        logFunction(TodoList);
+        writeFunction(TodoListLog);
+    }
+    else if(rgxDelete.test(input.value)){
+        let item=((input.value).split(deleteCommand));
+        item.shift(0,1);
+        item=item.join();
+        item=item.split(' ');
+        deleteFunction(TodoList,item);
+    }
+}
+function doFunction(){
+    let splitValue=((input.value).split(" в "));
+ 
+        splitValue.shift(0,1);
+        splitValue=splitValue.join();
+        splitValue=splitValue.split(' - ');
+ 
+    let textValue=splitValue.splice(1,1);
+ 
+        textValue=textValue.join();
+        splitValue=splitValue.join();
+        splitValue=splitValue.split(' ');
+ 
+    if(Math.random()===Math.random()){
+        textValue=lowChanceResponseText[Math.round(Math.random()*(lowChanceResponseText.length-1))];
+    }
+ 
+    nestingAdd(splitValue,TodoList,textValue);
+    console.log(TodoList);
+}
+function nestingAdd(items,list,text){
+    if(typeof items==='string'||items.length===0){
+       if(!(Array.isArray(list.value))){
+       list.value=[];
+       }
+       list.value.push(text);
+       return
+    }
+    console.log(list);
+    if(typeof list[`${items[0]}`]==='undefined'){
+    list[`${items[0]}`]={};
+    }
+    let lastlist=items[0];
+        items=items.filter((value,index)=>
+            index>0
+        );
+        nestingAdd(items,list[`${lastlist}`],text);   
+}
+ 
+function logFunction(list){
+    for (var childKey in list) {    
+        if (typeof list[childKey] === 'object' &&
+            !Array.isArray(list[childKey]) &&
+            list[childKey] !== null) {
+            if(typeof list[childKey].value!=='undefined'){
+                if (list[childKey].value.length > 0) {
+                    var currentValues = [];
+                    currentValues.push(`${childKey}: ${list[childKey].value}`);
+                    currentValues=currentValues.join();
+                    TodoListLog.push(currentValues);
+                }
+            }
+            logFunction(list[childKey]);
+        }
+    }
+}
+function writeFunction(list){
+    for(i=0;i<list.length;i++){
+        console.log(list[i]);
+    }
+}
+function deleteFunction(list,items){
+   for (var childKey in list) {   
+        if (typeof list[childKey] === 'object' &&
+            !Array.isArray(list[childKey]) &&
+            list[childKey] !== null) {
+            if(childKey===items[0]){
+                if(typeof list[childKey].value!=='undefined'&& items[1]==='value'){
+                    console.log(items[1]);
+                    delete list[childKey].value
+                }
+                else if(items.length===1){
+                    delete list[childKey];
+                }
+                items=items.filter((value,index)=>index>0);
+            }
+            deleteFunction(list[childKey],items);
+        }
+    }
 }
 
 
@@ -174,10 +261,11 @@ function functionTree() {
     else if(setText.setWeather.includes(input.value)){
         weatherFunction();
     }
-    else if(input.value==="sup"){
-        todo();
+    else if(rgxSet.test(input.value)||rgxLog.test(input.value)||rgxDelete.test(input.value)){
+        TODOfunctionHub()
     }
     else{
+
         randomNumber=Math.floor(Math.random()*(randomText.random.length));
         while(randomNumber===randomText.random.length||randomNumber===lastNumber){
             randomNumber=Math.floor(Math.random()*(randomText.random.length));
@@ -188,6 +276,7 @@ function functionTree() {
     }
 }
 
-
-input.addEventListener('keyup', functionTree);
-populateList(items,itemsList);
+button.addEventListener('click', functionTree);
+//боте, запомни в баба си - си да
+//боте, кво запомни?
+//боте, махни баба си value

@@ -215,22 +215,32 @@ function writeFunction(list){
         console.log(list[i]);
     }
 }
-function deleteFunction(list,items){
-   for (var childKey in list) {   
+function deleteFunction(list, items) {
+    for (var childKey in list) {
         if (typeof list[childKey] === 'object' &&
             !Array.isArray(list[childKey]) &&
             list[childKey] !== null) {
-            if(childKey===items[0]){
-                if(typeof list[childKey].value!=='undefined'&& items[1]==='value'){
-                    console.log(items[1]);
-                    delete list[childKey].value
+            if (childKey === items[0]) {
+                console.log(items);
+                if (typeof list[childKey].value !== 'undefined' && items[1] === 'value') {
+                    items[2] = parseInt(items[2]);
+                    console.log(typeof items[2]);
+                    if (typeof items[2] === 'number') {
+                        list[childKey].value = list[childKey].value.filter((value, index) => index === [items[2] - 1]);
+                        console.log(TodoList);
+                    }
+                    else {
+                        delete list[childKey].value;
+                        console.log(TodoList);
+                    }
                 }
-                else if(items.length===1){
+                else if (items.length === 1) {
                     delete list[childKey];
+                    console.log(TodoList);
                 }
-                items=items.filter((value,index)=>index>0);
+                items = items.filter((value, index) => index > 0);
             }
-            deleteFunction(list[childKey],items);
+            deleteFunction(list[childKey], items);
         }
     }
 }

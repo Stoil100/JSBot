@@ -1,0 +1,26 @@
+body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background: rgb(2,0,36);
+background: linear-gradient(43deg, rgba(2,0,36,1) 0%, rgba(206,216,237,1) 100%);
+    background-repeat:no-repeat;
+    height: 100vh;
+}
+.output{
+    height:70vh;
+    width:fit-content;
+    border-radius:10px;
+    overflow-y: scroll;
+}
+.suggestion{
+    height:70vh;
+    overflow-y: scroll;
+    border-radius:20px;
+}
+.suggestionAndOutput{
+    display:flex;
+    justify-content: space-around;
+}

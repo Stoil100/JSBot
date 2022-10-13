@@ -1,10 +1,10 @@
 let randomNumber;
 let lastNumber;
-let input = document.getElementById('input1');
-const response = document.getElementById('responseArea');
+let input = document.getElementById('input');
+let response = document.querySelector('.output');
 const button = document.querySelector('.button');
-const itemsList=document.querySelector('.place');
-const items = JSON.parse(localStorage.getItem('items'))||[];
+let items=JSON.parse(localStorage.getItem('items'))||'';
+response.innerText=items;
 //set text
 const setText = {
     setHello:["Хеллоу","Hi","драсте"],
@@ -17,15 +17,7 @@ const randomText = {
     greeting:["Hey, I'm bot", "Здрастииии","Добро утроо","Heya!"],
     hello:["Hey, I'm bot", "Здрастииии","Добро утроо","Heya!","from the other side","is it me you are looking for?"],
     like:["Кондьо", "Джена" ,"Джорджано", "Гери и Никол"],
-    random:["Did I mention that you speak Bulgarian?","Oh my!"," ", "Yeah dude, I feel that..","That's a weird thing to say,"," "]
-    /*time:[`абе май е ${setInterval(trolTimeFunction,1000)}`,`Шес бес десет, няма бе, ${setInterval(actualTimeFunction,1000)} е..`],/*,`Ако умножиш ${X} по ${Y} ще получиш unix timestamp, който лесно можеш сам да си пресметнеш и да получиш текущата дата`],
-    weather:[ 
-        `В момента е ${weatherDescription}`,
-        `За тези, които ги мързи да погледнат през прозореца - вън е ${weatherCondition}`,
-        `*Наплюнчва пръст и го показва през прозореца* Усещам вятър в посока ${direction}, около ${speed} метра в секунда`,
-        `Вън е ${temp} градуса, егати студа!`, (Note: When temperature is below 0 celsius)
-        `${temp} градуса, как живеете вие в тая жега, добре че съм бот!`]*/
-};
+    random:["Did I mention that you speak Bulgarian?","Oh my!","", "Yeah dude, I feel that..","That's a weird thing to say,",""]};
 
 const setCommand = 'боте, запомни в ';
 const logCommand = 'боте, кво запомни?';
@@ -38,7 +30,7 @@ let TodoListLog=[];
 console.log("боте, запомни в баба си - си да",
 "боте, кво запомни?","боте, махни баба си value");
  
-let TodoList={};
+let TodoList=JSON.parse(localStorage.getItem('TodoList'))||{};
 let lowChanceResponseText=["да ъпгрейдна бота", "да си гледам работата!", "да спра да занимавам бота с глупости", "да си пусна новата песен на Криско"];
 
 function timeFunction(){
@@ -67,8 +59,7 @@ function timeFunction(){
             break;
         }
     }
-       
-    }
+}
     
 
     if(hour<10)hour=`0${hour}`;
@@ -83,7 +74,9 @@ function timeFunction(){
     const time=[`Шес бес десет, няма бе, ${actualTime} е..`,`абе май е ${trolTime}`,
     `Ако умножиш ${X} по ${Y} ще получиш unix timestamp, който лесно можеш сам да си пресметнеш и да получиш текущата дата`];
 
-    response.textContent=time[randomNumber];
+    items=items.concat(`\n${time[randomNumber]}`);
+    response.innerText=items;
+    localStorage.setItem('items',JSON.stringify(items));
     lastNumber=randomNumber;   
 }
 
@@ -92,18 +85,20 @@ function weatherFunction(){
     let windSpeed;
     let weatherCondition;
     let windDirection;
+    let weatherDescription;
     fetch('https://api.openweathermap.org/data/2.5/weather?q=Varna&lang=bg&APPID=5637a28789778bf15860cef0c6d5e947')
 .then(response=>response.json())
 .then(data => {
     temp=data['main']['temp'];  
     windSpeed=data['wind']['speed'];
     windDirection=data['wind']['deg'];
-    weatherCondition=data['weather'][0]['description']
+    weatherCondition=data['weather'][0]['description'];
+    weatherDescription=data['weather'][0]['main'];
     console.log(data);
 })
 .catch(error=>alert("Somethings wrong I can feel it"));
 
-setTimeout(logTemp,200); 
+setTimeout(logTemp,250); 
 
 function logTemp(){
 
@@ -115,31 +110,40 @@ function logTemp(){
     else if(windDirection>225&&windDirection<=270)windDirection="юго-запад";
     else if(windDirection>270&&windDirection<=315)windDirection="запад";
     else if(windDirection>315&&windDirection<=360)windDirection="северо-запад";
-
-
+    
+    temp=Math.round(temp);
+    temp=String(temp);
+    temp=temp.split('');
+    temp=temp.filter((value,index)=>index!==1);
+    temp=temp.join('');
+    temp=parseInt(temp);
+    
     let weather=[ 
-        `В момента е ${weatherCondition}`,
+        `В момента е ${weatherDescription}`,
         `За тези, които ги мързи да погледнат през прозореца - вън е ${weatherCondition}`,
         `*Наплюнчва пръст и го показва през прозореца* Усещам вятър в посока ${windDirection}, около ${windSpeed} метра в секунда`,
-        `Навън е ${Math.floor(temp/10)} градуса`
+        `Навън е ${temp} градуса`
     ];
 
-    if(Math.floor(temp/10)<=0){
-        weather[weather.length-1]=`Вън е ${Math.round(temp/10)} градуса, егати студа!`;
+    if(temp<=0){
+        weather[weather.length-1]=`Вън е ${temp} градуса, егати студа!`;
     }
-    if(Math.floor(temp/10)>=30){
-        weather[weather.length-1]=`${Math.round(temp/10)} градуса, как живеете вие в тая жега, добре че съм бот!`;
+    if(temp>=30){
+        weather[weather.length-1]=`${temp} градуса, как живеете вие в тая жега, добре че съм бот!`;
     }
         randomNumber=Math.floor(Math.random()*(weather.length));
         while(randomNumber===weather.length||randomNumber===lastNumber)randomNumber=Math.floor(Math.random()*(weather.length));
 
-        response.textContent=weather[randomNumber];
+    items=items.concat(`\n${weather[randomNumber]}`);
+    response.innerText=items;
+    localStorage.setItem('items',JSON.stringify(items));
     lastNumber=randomNumber;  
 }
 }
   function TODOfunctionHub(){
     if(rgxSet.test(input.value)){
         doFunction();
+        localStorage.setItem('TodoList',JSON.stringify(TodoList));
     }
     else if(rgxLog.test(input.value)){
         TodoListLog=[];
@@ -152,6 +156,7 @@ function logTemp(){
         item=item.join();
         item=item.split(' ');
         deleteFunction(TodoList,item);
+        localStorage.setItem('TodoList',JSON.stringify(TodoList));
     }
 }
 function doFunction(){
@@ -211,8 +216,12 @@ function logFunction(list){
     }
 }
 function writeFunction(list){
+    console.log(list);
     for(i=0;i<list.length;i++){
         console.log(list[i]);
+        items=items.concat(`\n${list[i]}`);
+        response.innerText=items;
+        localStorage.setItem('items',JSON.stringify(items));
     }
 }
 function deleteFunction(list, items) {
@@ -251,22 +260,28 @@ function functionTree() {
         randomNumber=Math.round((Math.random()*randomText.greeting.length));
         if(randomNumber===randomText.greeting.length)randomNumber--;
 
-            response.textContent=randomText.greeting[randomNumber];
+            items=items.concat(`\n${randomText.greeting[randomNumber]}`);
+            response.innerText=items;
+            localStorage.setItem('items',JSON.stringify(items));
     }
-    else if(input1.value==="Hello"){
+    else if(input.value==="Hello"){
         randomNumber=Math.round(Math.random()*randomText.hello.length);
         if(randomNumber===randomText.hello.length)randomNumber--;
 
-            response.textContent=randomText.hello[randomNumber];
+            items=items.concat(`\n${randomText.hello[randomNumber]}`);
+            response.innerText=items;
+            localStorage.setItem('items',JSON.stringify(items));
     }
     else if(setText.setLike.includes(input.value)){
         randomNumber=Math.round(Math.random()*randomText.like.length);
         if(randomNumber===randomText.like.length)randomNumber--;
 
-            response.textContent=randomText.like[randomNumber];
+            items=items.concat(`\n${randomText.like[randomNumber]}`);
+            response.innerText=items;
+            localStorage.setItem('items',JSON.stringify(items));
     }
     else if(setText.setTime.includes(input.value)){
-    timeFunction();
+        timeFunction();
     }
     else if(setText.setWeather.includes(input.value)){
         weatherFunction();
@@ -280,13 +295,14 @@ function functionTree() {
         while(randomNumber===randomText.random.length||randomNumber===lastNumber){
             randomNumber=Math.floor(Math.random()*(randomText.random.length));
         }
-
-        response.textContent=randomText.random[randomNumber];
-        lastNumber=randomNumber;
+            items=items.concat(`\n${randomText.random[randomNumber]}`);
+            response.innerText=items;
+            localStorage.setItem('items',JSON.stringify(items));
+            lastNumber=randomNumber;
     }
 }
 
-button.addEventListener('click', functionTree);
+button.addEventListener('click',functionTree);
 //боте, запомни в баба си - си да
 //боте, кво запомни?
 //боте, махни баба си value

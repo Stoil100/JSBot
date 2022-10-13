@@ -3,6 +3,7 @@ let lastNumber;
 let input = document.getElementById('input');
 let response = document.querySelector('.output');
 const button = document.querySelector('.button');
+const clearButton=document.querySelector('.clearButton');
 let items=JSON.parse(localStorage.getItem('items'))||'';
 response.innerText=items;
 //set text
@@ -301,7 +302,12 @@ function functionTree() {
             lastNumber=randomNumber;
     }
 }
+function clearInputFunction(){
+    items="";
+    response.innerText="";
+}
 
+clearButton.addEventListener('click',clearInputFunction)
 button.addEventListener('click',functionTree);
 //боте, запомни в баба си - си да
 //боте, кво запомни?

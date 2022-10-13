@@ -9,6 +9,7 @@ background: linear-gradient(43deg, rgba(2,0,36,1) 0%, rgba(206,216,237,1) 100%);
     background-repeat:no-repeat;
     height: 100vh;
 }
+
 .output{
     height:70vh;
     width:fit-content;
@@ -17,10 +18,12 @@ background: linear-gradient(43deg, rgba(2,0,36,1) 0%, rgba(206,216,237,1) 100%);
 }
 .suggestion{
     height:70vh;
+    max-width: 20vw;
     overflow-y: scroll;
     border-radius:20px;
 }
 .suggestionAndOutput{
+    width: 70vw;
     display:flex;
-    justify-content: space-around;
+    justify-content: space-between;
 }

@@ -1,20 +1,27 @@
+*{
+    margin:0;
+    color:white;
+}
+button, input{
+    background-image: linear-gradient(-20deg, #fc6076 0%, #ff9a44 100%);
+}
+
 body{
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     text-align:center;
-    background: rgb(2,0,36);
-background: linear-gradient(43deg, rgba(2,0,36,1) 0%, rgba(206,216,237,1) 100%);
-    background-repeat:no-repeat;
+    background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
     height: 100vh;
 }
 
 .output{
     height:70vh;
-    width:fit-content;
+    width:45vw;
     border-radius:10px;
     overflow-y: scroll;
+    font-size:large;
 }
 .suggestion{
     height:70vh;

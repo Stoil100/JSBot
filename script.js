@@ -8,9 +8,9 @@ let items=JSON.parse(localStorage.getItem('items'))||'';
 response.innerText=items;
 //set text
 const setText = {
-    setHello:["Хеллоу","Hi","драсте"],
-    setLike:["I like","аз обичам","аз харесвам"],
-    setTime:["Колко е часа?","Час","Време","hour"],
+    setHello:["хеллоу","hi","драсте"],
+    setLike:["i like","аз обичам","аз харесвам"],
+    setTime:["колко е часа?","час","време","hour"],
     setWeather:["weather","прогноза","вали","градус","ракия","сняг","дъжд"]
 };
 //responding text
@@ -27,12 +27,20 @@ let rgxSet = new RegExp("^(".concat(setCommand, ") *\w*"));
 let rgxLog = new RegExp(`${logCommand}`);
 let rgxDelete = new RegExp("^(".concat(deleteCommand, ") *\w*"));
 let TodoListLog=[];
-
-console.log("боте, запомни в баба си - си да",
-"боте, кво запомни?","боте, махни баба си value");
  
 let TodoList=JSON.parse(localStorage.getItem('TodoList'))||{};
 let lowChanceResponseText=["да ъпгрейдна бота", "да си гледам работата!", "да спра да занимавам бота с глупости", "да си пусна новата песен на Криско"];
+
+function writeOutputFunction(list){
+       randomNumber=Math.round(Math.random()*list.length);
+        while(randomNumber===list.length || randomNumber===lastNumber){
+            randomNumber=Math.round(Math.random()*list.length);
+        }
+            items=items.concat(`\n${list[randomNumber]}`);
+            response.innerText=items;
+            localStorage.setItem('items',JSON.stringify(items));
+            lastNumber=randomNumber;
+}
 
 function timeFunction(){
     let currentTime=new Date();
@@ -47,7 +55,6 @@ function timeFunction(){
     let trolHour=Math.round(Math.random()*currentTime.getHours());
     let trolMinutes=Math.round(Math.random()*currentTime.getMinutes());
 
-    if(randomNumber===2){
     for(i=2;i<=timestamp;i++){
         if(timestamp%i==0){
             X=i;
@@ -60,8 +67,6 @@ function timeFunction(){
             break;
         }
     }
-}
-    
 
     if(hour<10)hour=`0${hour}`;
     if(minutes<10)minutes=`0${minutes}`;
@@ -74,34 +79,26 @@ function timeFunction(){
     
     const time=[`Шес бес десет, няма бе, ${actualTime} е..`,`абе май е ${trolTime}`,
     `Ако умножиш ${X} по ${Y} ще получиш unix timestamp, който лесно можеш сам да си пресметнеш и да получиш текущата дата`];
-
-    items=items.concat(`\n${time[randomNumber]}`);
-    response.innerText=items;
-    localStorage.setItem('items',JSON.stringify(items));
-    lastNumber=randomNumber;   
+    
+    writeOutputFunction(time)
 }
 
-function weatherFunction(){
-    let temp;
-    let windSpeed;
-    let weatherCondition;
-    let windDirection;
-    let weatherDescription;
+function weatherFunction(){ 
     fetch('https://api.openweathermap.org/data/2.5/weather?q=Varna&lang=bg&APPID=5637a28789778bf15860cef0c6d5e947')
 .then(response=>response.json())
 .then(data => {
-    temp=data['main']['temp'];  
-    windSpeed=data['wind']['speed'];
-    windDirection=data['wind']['deg'];
-    weatherCondition=data['weather'][0]['description'];
-    weatherDescription=data['weather'][0]['main'];
     console.log(data);
+        logTemp(data);
 })
 .catch(error=>alert("Somethings wrong I can feel it"));
 
-setTimeout(logTemp,250); 
 
-function logTemp(){
+function logTemp(data){
+    let temp=data['main']['temp'];  
+    let windSpeed=data['wind']['speed'];
+    let windDirection=data['wind']['deg'];
+    let weatherCondition=data['weather'][0]['description'];
+    let weatherDescription=data['weather'][0]['main'];
 
     if(windDirection>=0&&windDirection<=45)windDirection="север";
     else if(windDirection>45&&windDirection<=90)windDirection="северо-изток";
@@ -112,12 +109,7 @@ function logTemp(){
     else if(windDirection>270&&windDirection<=315)windDirection="запад";
     else if(windDirection>315&&windDirection<=360)windDirection="северо-запад";
     
-    temp=Math.round(temp);
-    temp=String(temp);
-    temp=temp.split('');
-    temp=temp.filter((value,index)=>index!==1);
-    temp=temp.join('');
-    temp=parseInt(temp);
+    temp=Math.round(temp-273.15);
     
     let weather=[ 
         `В момента е ${weatherDescription}`,
@@ -132,26 +124,21 @@ function logTemp(){
     if(temp>=30){
         weather[weather.length-1]=`${temp} градуса, как живеете вие в тая жега, добре че съм бот!`;
     }
-        randomNumber=Math.floor(Math.random()*(weather.length));
-        while(randomNumber===weather.length||randomNumber===lastNumber)randomNumber=Math.floor(Math.random()*(weather.length));
-
-    items=items.concat(`\n${weather[randomNumber]}`);
-    response.innerText=items;
-    localStorage.setItem('items',JSON.stringify(items));
-    lastNumber=randomNumber;  
+    writeOutputFunction(weather);
 }
+    
 }
   function TODOfunctionHub(){
-    if(rgxSet.test(input.value)){
+    if(rgxSet.test((input.value).toLowerCase())){
         doFunction();
         localStorage.setItem('TodoList',JSON.stringify(TodoList));
     }
-    else if(rgxLog.test(input.value)){
+    else if(rgxLog.test((input.value).toLowerCase())){
         TodoListLog=[];
         logFunction(TodoList);
         writeFunction(TodoListLog);
     }
-    else if(rgxDelete.test(input.value)){
+    else if(rgxDelete.test((input.value).toLowerCase())){
         let item=((input.value).split(deleteCommand));
         item.shift(0,1);
         item=item.join();
@@ -160,6 +147,7 @@ function logTemp(){
         localStorage.setItem('TodoList',JSON.stringify(TodoList));
     }
 }
+
 function doFunction(){
     let splitValue=((input.value).split(" в "));
  
@@ -176,7 +164,7 @@ function doFunction(){
     if(Math.random()===Math.random()){
         textValue=lowChanceResponseText[Math.round(Math.random()*(lowChanceResponseText.length-1))];
     }
- 
+
     nestingAdd(splitValue,TodoList,textValue);
     console.log(TodoList);
 }
@@ -216,6 +204,7 @@ function logFunction(list){
         }
     }
 }
+
 function writeFunction(list){
     console.log(list);
     for(i=0;i<list.length;i++){
@@ -225,6 +214,7 @@ function writeFunction(list){
         localStorage.setItem('items',JSON.stringify(items));
     }
 }
+
 function deleteFunction(list, items) {
     for (var childKey in list) {
         if (typeof list[childKey] === 'object' &&
@@ -257,51 +247,31 @@ function deleteFunction(list, items) {
 
 
 function functionTree() {
-    if(setText.setHello.includes(input.value)){
-        randomNumber=Math.round((Math.random()*randomText.greeting.length));
-        if(randomNumber===randomText.greeting.length)randomNumber--;
-
-            items=items.concat(`\n${randomText.greeting[randomNumber]}`);
-            response.innerText=items;
-            localStorage.setItem('items',JSON.stringify(items));
+    if(setText.setHello.includes((input.value).toLowerCase())){
+        writeOutputFunction(randomText.greeting);
     }
     else if(input.value==="Hello"){
-        randomNumber=Math.round(Math.random()*randomText.hello.length);
-        if(randomNumber===randomText.hello.length)randomNumber--;
-
-            items=items.concat(`\n${randomText.hello[randomNumber]}`);
-            response.innerText=items;
-            localStorage.setItem('items',JSON.stringify(items));
+       writeOutputFunction(randomText.hello);
     }
-    else if(setText.setLike.includes(input.value)){
-        randomNumber=Math.round(Math.random()*randomText.like.length);
-        if(randomNumber===randomText.like.length)randomNumber--;
-
-            items=items.concat(`\n${randomText.like[randomNumber]}`);
-            response.innerText=items;
-            localStorage.setItem('items',JSON.stringify(items));
+    else if(setText.setLike.includes((input.value).toLowerCase())){
+        writeOutputFunction(randomText.like);
     }
-    else if(setText.setTime.includes(input.value)){
+    else if(setText.setTime.includes((input.value).toLowerCase())){
         timeFunction();
     }
-    else if(setText.setWeather.includes(input.value)){
+    else if(setText.setWeather.includes((input.value).toLowerCase())){
         weatherFunction();
     }
-    else if(rgxSet.test(input.value)||rgxLog.test(input.value)||rgxDelete.test(input.value)){
+    else if(rgxSet.test((input.value).toLowerCase())||
+            rgxLog.test((input.value).toLowerCase())||
+            rgxDelete.test((input.value).toLowerCase())){
         TODOfunctionHub()
     }
     else{
-
-        randomNumber=Math.floor(Math.random()*(randomText.random.length));
-        while(randomNumber===randomText.random.length||randomNumber===lastNumber){
-            randomNumber=Math.floor(Math.random()*(randomText.random.length));
-        }
-            items=items.concat(`\n${randomText.random[randomNumber]}`);
-            response.innerText=items;
-            localStorage.setItem('items',JSON.stringify(items));
-            lastNumber=randomNumber;
+        writeOutputFunction(randomText.random);
     }
 }
+
 function clearInputFunction(){
     items="";
     response.innerText="";
@@ -309,6 +279,3 @@ function clearInputFunction(){
 
 clearButton.addEventListener('click',clearInputFunction)
 button.addEventListener('click',functionTree);
-//боте, запомни в баба си - си да
-//боте, кво запомни?
-//боте, махни баба си value

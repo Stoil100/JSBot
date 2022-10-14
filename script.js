@@ -1,8 +1,8 @@
 let randomNumber;
 let lastNumber;
+let thisTextList;
 let input = document.getElementById('input');
 let response = document.querySelector('.output');
-const button = document.querySelector('.button');
 const clearButton=document.querySelector('.clearButton');
 let items=JSON.parse(localStorage.getItem('items'))||'';
 response.innerText=items;
@@ -77,9 +77,12 @@ function timeFunction(){
     let actualTime=`${hour}:${minutes}`;
     let trolTime=`${trolHour}:${trolMinutes}`;
     
-    const time=[`Шес бес десет, няма бе, ${actualTime} е..`,`абе май е ${trolTime}`,
+    let time=[`Шес бес десет, няма бе, ${actualTime} е..`,`абе май е ${trolTime}`,
     `Ако умножиш ${X} по ${Y} ще получиш unix timestamp, който лесно можеш сам да си пресметнеш и да получиш текущата дата`];
     
+    if(actualTime==='05:50'||actualTime==='17:50'){
+        time[0]='Шес бес десет е!!!';
+    }
     writeOutputFunction(time)
 }
 
@@ -112,7 +115,7 @@ function logTemp(data){
     temp=Math.round(temp-273.15);
     
     let weather=[ 
-        `В момента е ${weatherDescription}`,
+        `weather condition is ${weatherDescription}`,
         `За тези, които ги мързи да погледнат през прозореца - вън е ${weatherCondition}`,
         `*Наплюнчва пръст и го показва през прозореца* Усещам вятър в посока ${windDirection}, около ${windSpeed} метра в секунда`,
         `Навън е ${temp} градуса`
@@ -161,22 +164,23 @@ function doFunction(){
         splitValue=splitValue.join();
         splitValue=splitValue.split(' ');
  
-    if(Math.random()===Math.random()){
+    if(Math.round(Math.random()*10)===10){
         textValue=lowChanceResponseText[Math.round(Math.random()*(lowChanceResponseText.length-1))];
     }
-
     nestingAdd(splitValue,TodoList,textValue);
-    console.log(TodoList);
 }
 function nestingAdd(items,list,text){
+    if(items.length===1){
+        thisTextList=items[0];
+    }
     if(typeof items==='string'||items.length===0){
        if(!(Array.isArray(list.value))){
        list.value=[];
        }
-       list.value.push(text);
-       return
+        response.innerText=`successfuly added *${text}* to *${thisTextList}*`;
+        list.value.push(text);
+        return
     }
-    console.log(list);
     if(typeof list[`${items[0]}`]==='undefined'){
     list[`${items[0]}`]={};
     }
@@ -206,45 +210,41 @@ function logFunction(list){
 }
 
 function writeFunction(list){
-    console.log(list);
     for(i=0;i<list.length;i++){
-        console.log(list[i]);
         items=items.concat(`\n${list[i]}`);
         response.innerText=items;
         localStorage.setItem('items',JSON.stringify(items));
     }
 }
 
-function deleteFunction(list, items) {
+function deleteFunction(list, itemsList) {
     for (var childKey in list) {
         if (typeof list[childKey] === 'object' &&
             !Array.isArray(list[childKey]) &&
             list[childKey] !== null) {
-            if (childKey === items[0]) {
-                console.log(items);
-                if (typeof list[childKey].value !== 'undefined' && items[1] === 'value') {
-                    items[2] = parseInt(items[2]);
-                    console.log(typeof items[2]);
-                    if (typeof items[2] === 'number') {
-                        list[childKey].value = list[childKey].value.filter((value, index) => index === [items[2] - 1]);
-                        console.log(TodoList);
+            if (childKey === itemsList[0]) {
+                if (typeof list[childKey].value !== 'undefined' && typeof parseInt(itemsList[1]) === 'number') {
+                    itemsList[1] = parseInt(itemsList[1]);
+                    if (typeof itemsList[1] === 'number') {
+                        console.log(itemsList[1])
+                            if(itemsList[1]!==itemsList[1])itemsList[1]=""
+                        response.innerText=`\ndeleted ${childKey} ${itemsList[1]} value`;
+                        list[childKey].value = list[childKey].value.filter((value, index) => index === [itemsList[1] - 1]);
                     }
                     else {
+                        response.innerText=`\ndeleted ${childKey} value`;
                         delete list[childKey].value;
-                        console.log(TodoList);
                     }
                 }
-                else if (items.length === 1) {
+                else if (itemsList.length === 1) {
                     delete list[childKey];
-                    console.log(TodoList);
                 }
-                items = items.filter((value, index) => index > 0);
+                itemsList = itemsList.filter((value, index) => index > 0);
             }
-            deleteFunction(list[childKey], items);
+            deleteFunction(list[childKey], itemsList);
         }
     }
 }
-
 
 function functionTree() {
     if(setText.setHello.includes((input.value).toLowerCase())){
@@ -277,5 +277,9 @@ function clearInputFunction(){
     response.innerText="";
 }
 
-clearButton.addEventListener('click',clearInputFunction)
-button.addEventListener('click',functionTree);
+clearButton.addEventListener('click',clearInputFunction);
+input.addEventListener('keypress',function(event){
+    if (event.key === "Enter") {
+        functionTree();
+    }
+});

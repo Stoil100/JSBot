@@ -3,6 +3,7 @@ let lastNumber;
 let thisTextList;
 let input = document.getElementById('input');
 let response = document.querySelector('.output');
+const button = document.querySelector('.button');
 const clearButton=document.querySelector('.clearButton');
 let items=JSON.parse(localStorage.getItem('items'))||'';
 response.innerText=items;
@@ -277,6 +278,7 @@ function clearInputFunction(){
     response.innerText="";
 }
 
+button.addEventListener('click',functionTree);
 clearButton.addEventListener('click',clearInputFunction);
 input.addEventListener('keypress',function(event){
     if (event.key === "Enter") {
